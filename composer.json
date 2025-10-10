@@ -1,0 +1,48 @@
+{
+    "name": "super-kernel/server",
+    "description": "The server component for super-kernel.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "swoole",
+        "super-kernel",
+        "server"
+    ],
+    "autoload": {
+        "psr-4": {
+            "SuperKernel\\Server\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SuperKernelTest\\Server\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "wheakerd",
+            "email": "wheakerd@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.4",
+        "ext-swoole": "6.*",
+        "super-kernel/contract": "^1.0",
+        "super-kernel/command": "^1.0",
+        "super-kernel/attribute": "^1.0"
+    },
+    "require-dev": {
+        "swoole/ide-helper": "^6.0",
+        "super-kernel/composer-plugin": "^1.0",
+        "super-kernel/di": "^1.0",
+        "super-kernel/event-dispatcher": "^1.0",
+        "super-kernel/framework": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "super-kernel/composer-plugin": true
+        }
+    }
+}
