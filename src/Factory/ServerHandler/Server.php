@@ -11,13 +11,13 @@ use SuperKernel\Server\Event\BeforeServerStart;
 use SuperKernel\Server\Interface\ServerInterface;
 use Swoole\Server as SwooleServer;
 
-final readonly class Server implements ServerInterface
+final class Server implements ServerInterface
 {
 	private SwooleServer $server;
 
 	private Mode $mode;
 
-	public function __construct(private EventDispatcherInterface $eventDispatcher)
+	public function __construct(private readonly EventDispatcherInterface $eventDispatcher)
 	{
 	}
 
