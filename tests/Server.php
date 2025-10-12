@@ -15,7 +15,7 @@ final class Server implements ServerConfigInterface
 {
 	public function getMode(): Mode
 	{
-		return Mode::SWOOLE_THREAD;
+		return Mode::SWOOLE_PROCESS;
 	}
 
 	public function getServerConfigs(): array

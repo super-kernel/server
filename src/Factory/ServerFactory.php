@@ -35,7 +35,7 @@ final readonly class ServerFactory
 	{
 		$server = $this->getServer($serverConfig->getMode());
 
-		foreach ($serverConfig as $config) {
+		foreach ($serverConfig->getServerConfigs() as $config) {
 			$server->addServer($config);
 		}
 

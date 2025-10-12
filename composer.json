@@ -28,7 +28,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=8.4",
-        "ext-swoole": "6.*",
+        "ext-swoole": ">=6.0",
         "super-kernel/command": "^1.0",
         "super-kernel/config": "^1.0"
     },
@@ -37,7 +37,8 @@
         "super-kernel/composer-plugin": "^1.0",
         "super-kernel/di": "^1.0",
         "super-kernel/event-dispatcher": "^1.0",
-        "super-kernel/framework": "^1.0"
+        "super-kernel/framework": "^1.0",
+        "super-kernel/logger": "^1.0"
     },
     "config": {
         "allow-plugins": {
