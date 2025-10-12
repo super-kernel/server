@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Event;
 
-use SuperKernel\Server\Config;
+use SuperKernel\Server\ServerConfig;
 use SuperKernel\Server\Mode;
 use Swoole\Coroutine\Http\Server as HttpServer;
 use Swoole\Coroutine\Server;
@@ -13,7 +13,7 @@ final class BeforeServerStart
 {
 	public function __construct(
 		public SwooleServer|HttpServer|Server $server,
-		public Config                         $config,
+		public ServerConfig                   $config,
 		public Mode                           $mode,
 	)
 	{

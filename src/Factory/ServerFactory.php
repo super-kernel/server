@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SuperKernel\Attribute\Contract;
 use SuperKernel\Attribute\Factory;
-use SuperKernel\Server\ConfigInterface;
+use SuperKernel\Server\ServerConfigInterface;
 use SuperKernel\Server\Factory\ServerHandler\CoroutineServer;
 use SuperKernel\Server\Factory\ServerHandler\Server;
 use SuperKernel\Server\Interface\ServerInterface;
@@ -25,16 +25,36 @@ final readonly class ServerFactory
 	}
 
 	/**
-	 * @param ConfigInterface $config
+	 * @param ServerConfigInterface $serverConfig
 	 *
 	 * @return ServerInterface
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function __invoke(ConfigInterface $config): ServerInterface
+	public function __invoke(ServerConfigInterface $serverConfig): ServerInterface
 	{
-		return $config->getMode() === Mode::SWOOLE_DISABLE
+		$server = $this->getServer($serverConfig->getMode());
+
+		foreach ($serverConfig as $config) {
+			$server->addServer($config);
+		}
+
+		return $server;
+	}
+
+	/**
+	 * @param Mode $mode
+	 *
+	 * @return ServerInterface
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+	private function getServer(Mode $mode): ServerInterface
+	{
+		$server = $mode === Mode::SWOOLE_DISABLE
 			? $this->container->get(CoroutineServer::class)
 			: $this->container->get(Server::class);
+
+		return $server->setMode($mode);
 	}
 }

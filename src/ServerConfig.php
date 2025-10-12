@@ -3,36 +3,22 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server;
 
-use IteratorAggregate;
-use RuntimeException;
-use Traversable;
-
-final class ServerConfig implements IteratorAggregate
+final readonly class ServerConfig
 {
-	private array $configs;
-
-	public function __construct(Config ...$configs)
-	{
-		$this->configs = $configs;
-	}
-
-	public function first(): Config
-	{
-		if (empty($this->configs)) {
-			throw new RuntimeException('No Config available.');
-		}
-
-		return array_shift($this->configs);
-	}
-
 	/**
-	 * @return Traversable
-	 * @throws void
+	 * @param string     $name
+	 * @param ServerType $type
+	 * @param string     $host
+	 * @param int        $port
+	 * @param int        $sock_type
 	 */
-	public function getIterator(): Traversable
+	public function __construct(
+		public string     $name,
+		public ServerType $type,
+		public string     $host,
+		public int        $port,
+		public int        $sock_type,
+	)
 	{
-		foreach ($this->configs as $config) {
-			yield $config;
-		}
 	}
 }
