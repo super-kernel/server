@@ -5,20 +5,13 @@ namespace SuperKernel\Server;
 
 final readonly class ServerConfig
 {
-	/**
-	 * @param string     $name
-	 * @param ServerType $type
-	 * @param string     $host
-	 * @param int        $port
-	 * @param int        $sock_type
-	 */
-	public function __construct(
-		public string     $name,
-		public ServerType $type,
-		public string     $host,
-		public int        $port,
-		public int        $sock_type,
-	)
-	{
-	}
+    public function __construct(
+        public string     $name,
+        public ServerType $type,
+        public string     $host,
+        public int        $port,
+        public int        $sockType,
+    )
+    {
+    }
 }

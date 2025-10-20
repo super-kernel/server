@@ -10,5 +10,7 @@ interface ServerConfigInterface
 	/**
 	 * @return array<ServerConfig>
 	 */
-	public function getServerConfigs(): array;
+	public function getServers(): array;
+
+	public function getSettings(): array;
 }

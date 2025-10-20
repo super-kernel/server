@@ -9,7 +9,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SuperKernel\Server\Event\AfterMainServerStop;
 use SuperKernel\Server\Event\BeforeMainServerStart;
-use SuperKernel\Server\Interface\ServerInterface;
+use SuperKernel\Server\Contract\ServerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -34,15 +34,9 @@
     },
     "require-dev": {
         "swoole/ide-helper": "^6.0",
-        "super-kernel/composer-plugin": "^1.0",
-        "super-kernel/di": "^1.0",
+        "super-kernel/di": "^1.1",
         "super-kernel/event-dispatcher": "^1.0",
         "super-kernel/framework": "^1.0",
         "super-kernel/logger": "^1.0"
-    },
-    "config": {
-        "allow-plugins": {
-            "super-kernel/composer-plugin": true
-        }
     }
 }

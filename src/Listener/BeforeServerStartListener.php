@@ -8,8 +8,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SplPriorityQueue;
 use SuperKernel\Attribute\Listener;
+use SuperKernel\Contract\AttributeCollectorInterface;
 use SuperKernel\Contract\ListenerInterface;
-use SuperKernel\Contract\ReflectionManagerInterface;
 use SuperKernel\Server\Attribute\Event;
 use SuperKernel\Server\Event\BeforeServerStart;
 use SuperKernel\Server\Mode;
@@ -28,28 +28,24 @@ final class BeforeServerStartListener implements ListenerInterface
 	private array $events;
 
 	/**
-	 * @param ContainerInterface         $container
-	 * @param ReflectionManagerInterface $reflectionManager
+	 * @param ContainerInterface          $container
+	 * @param AttributeCollectorInterface $attributeCollector
 	 *
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function __construct(ContainerInterface $container, ReflectionManagerInterface $reflectionManager)
+	public function __construct(ContainerInterface $container, AttributeCollectorInterface $attributeCollector)
 	{
-		$classes = $reflectionManager->getAttributes(Event::class);
+		foreach ($attributeCollector->getAttributes(Event::class) as $class => $attributes) {
 
-		foreach ($classes as $class) {
-			$attributes = $reflectionManager->getClassAnnotations($class, Event::class);
-
+			/* @var Event $attribute */
 			foreach ($attributes as $attribute) {
 				/* @var Event $attributeInstance */
-				$attributeInstance = $attribute->newInstance();
+				$queue = $this->events[$attribute->server][$attribute->event] ?? new SplPriorityQueue();
 
-				$queue = $this->events[$attributeInstance->server][$attributeInstance->event] ?? new SplPriorityQueue();
+				$queue->insert($container->get($class), $attribute->priority);
 
-				$queue->insert($container->get($class), $attributeInstance->priority);
-
-				$this->events[$attributeInstance->server][$attributeInstance->event] = $queue;
+				$this->events[$attribute->server][$attribute->event] = $queue;
 			}
 		}
 	}
@@ -67,7 +63,10 @@ final class BeforeServerStartListener implements ListenerInterface
 
 		foreach ($this->events[$serverName] ?? [] as $eventName => $serverEvent) {
 			$eventQueue   = clone $serverEvent;
-			$eventHandler = [$eventQueue->top(), '__invoke'];
+			$eventHandler = [
+				$eventQueue->top(),
+				'__invoke',
+			];
 
 			if ($event->mode === Mode::SWOOLE_DISABLE) {
 				match ($event->config->type) {

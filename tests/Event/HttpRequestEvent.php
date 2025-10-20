@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Event;
+namespace SuperKernelTest\Server\Event;
 
 use SuperKernel\Server\Attribute\Event;
 use SuperKernel\Server\Enumeration\HttpServerEvent;
-use SuperKernel\Server\Interface\EventInterface;
+use SuperKernel\Server\Contract\EventInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 

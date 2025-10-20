@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace SuperKernel\Server\Factory;
+namespace SuperKernel\Server\Provider;
 
-use SuperKernel\Attribute\Contract;
 use SuperKernel\Attribute\Factory;
+use SuperKernel\Attribute\Provider;
 use SuperKernel\Contract\ConfigInterface;
 use SuperKernel\Server\ServerConfigInterface;
 
 #[
-	Contract(ServerConfigInterface::class),
+	Provider(ServerConfigInterface::class),
 	Factory,
 ]
-final class ConfigFactory
+final class ServerConfigProvider
 {
 	public function __invoke(ConfigInterface $config)
 	{
