@@ -18,27 +18,22 @@ use SuperKernel\Server\ServerHandler\Server;
 ]
 final class ServerProvider
 {
-	private ?ServerConfigInterface $serverConfig = null {
-		get => $this->serverConfig ??= $this->container->get(ServerConfigInterface::class);
+	private ?Server $server = null {
+		get => $this->server ??= $this->container->get(Server::class);
 	}
 
-	private ?ServerInterface $serverHandler = null {
-		get => $this->serverHandler ??= $this->serverConfig->getMode() === Mode::SWOOLE_DISABLE
-			? $this->container->get(CoroutineServer::class)
-			: $this->container->get(Server::class);
+	private ?CoroutineServer $coroutineServer = null {
+		get => $this->coroutineServer ??= $this->container->get(CoroutineServer::class);
 	}
 
 	public function __construct(private readonly ContainerInterface $container)
 	{
-		$this->serverHandler->setMode($this->serverConfig->getMode());
 	}
 
 	public function __invoke(ServerConfigInterface $serverConfig): ServerInterface
 	{
-		foreach ($serverConfig->getServers() as $config) {
-			$this->serverHandler->addServer($config, $this->serverConfig->getSettings());
-		}
-
-		return $this->serverHandler;
+		return $serverConfig->getMode() === Mode::SWOOLE_DISABLE
+			? $this->coroutineServer
+			: $this->server;
 	}
 }

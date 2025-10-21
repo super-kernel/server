@@ -4,13 +4,16 @@ declare(strict_types=1);
 namespace SuperKernel\Server\Contract;
 
 use SuperKernel\Server\ServerConfig;
-use SuperKernel\Server\Mode;
+use Swoole\Server;
 
 interface ServerInterface
 {
-	public function setMode(Mode $mode): ServerInterface;
-
-	public function addServer(ServerConfig $config, array $settings): void;
+	/**
+	 * @param ServerConfig $config
+	 *
+	 * @return Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server
+	 */
+	public function addServer(ServerConfig $config): Server|\Swoole\Coroutine\Server|\Swoole\Coroutine\Http\Server;
 
 	public function start(): void;
 }

@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Command;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SuperKernel\Server\Event\AfterMainServerStop;
 use SuperKernel\Server\Event\BeforeMainServerStart;
 use SuperKernel\Server\Contract\ServerInterface;
+use SuperKernel\Server\Event\BeforeServerStart;
+use SuperKernel\Server\ServerConfigInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,10 +23,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 ]
 final class StartServerCommand extends Command
 {
-	public function __construct(
-		private readonly ContainerInterface       $container,
-		private readonly EventDispatcherInterface $eventDispatcher,
-	)
+	private ?ServerInterface $server = null {
+		get => $this->server ??= $this->container->get(ServerInterface::class);
+	}
+
+	private ?ServerConfigInterface $serverConfig = null {
+		get => $this->serverConfig ??= $this->container->get(ServerConfigInterface::class);
+	}
+
+	private ?EventDispatcherInterface $eventDispatcher = null {
+		get => $this->eventDispatcher ??= $this->container->get(EventDispatcherInterface::class);
+	}
+
+	public function __construct(private readonly ContainerInterface $container)
 	{
 		parent::__construct();
 	}
@@ -36,16 +45,18 @@ final class StartServerCommand extends Command
 	 * @param OutputInterface $output
 	 *
 	 * @return int
-	 * @throws ContainerExceptionInterface
-	 * @throws NotFoundExceptionInterface
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
 	{
-		$serverHandler = $this->container->get(ServerInterface::class);
-
 		$this->eventDispatcher->dispatch(new BeforeMainServerStart());
 
-		$serverHandler->start();
+		foreach ($this->serverConfig->getServers() as $config) {
+			$server = $this->server->addServer($config);
+
+			$this->eventDispatcher->dispatch(new BeforeServerStart($server, $config));
+		}
+
+		$this->server->start();
 
 		$this->eventDispatcher->dispatch(new AfterMainServerStop());
 
