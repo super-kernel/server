@@ -29,14 +29,14 @@
     "require": {
         "php": ">=8.4",
         "ext-swoole": ">=6.0",
-        "super-kernel/command": "^1.0",
-        "super-kernel/config": "^1.0"
+        "super-kernel/command": "*",
+        "super-kernel/config": "*"
     },
     "require-dev": {
         "swoole/ide-helper": "^6.0",
-        "super-kernel/di": "^1.1",
-        "super-kernel/event-dispatcher": "^1.0",
-        "super-kernel/framework": "^1.0",
-        "super-kernel/logger": "^1.0"
+        "super-kernel/di": "@dev",
+        "super-kernel/event-dispatcher": "@dev",
+        "super-kernel/framework": "@dev",
+        "super-kernel/logger": "@dev"
     }
 }
