@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace SuperKernel\Server\Provider;
 
 use Psr\Container\ContainerInterface;
-use SuperKernel\Attribute\Factory;
-use SuperKernel\Attribute\Provider;
+use SuperKernel\Di\Attribute\Factory;
+use SuperKernel\Di\Attribute\Provider;
 use SuperKernel\Server\Contract\ServerInterface;
 use SuperKernel\Server\Mode;
 use SuperKernel\Server\ServerConfigInterface;
