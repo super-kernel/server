@@ -9,7 +9,7 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 
 #[CallbackEvent(event: 'request')]
-interface onRequestInterface extends CallbackEventInterface
+interface OnRequestInterface extends CallbackEventInterface
 {
 	public function __invoke(Request $request, Response $response): void;
 }

@@ -38,8 +38,8 @@
     },
     "require-dev": {
         "super-kernel/bootstrap": "~1.0.0",
-        "super-kernel/config": "^1.0",
-        "super-kernel/event-dispatcher": "^1.0",
+        "super-kernel/config": "~1.0.0",
+        "super-kernel/event-dispatcher": "~1.0.0",
         "super-kernel/framework": "~1.0.0",
         "swoole/ide-helper": "~6.0.0"
     }

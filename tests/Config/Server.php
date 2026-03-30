@@ -1,24 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace SuperKernelTest\Server;
+namespace SuperKernelTest\Server\Config;
 
 use SuperKernel\Config\Attribute\Configuration;
-use SuperKernel\Server\Constants\ServerTypeConstants;
-use SuperKernel\Server\Constants\ServerModeConstants;
+use SuperKernel\Server\Config;
 use SuperKernel\Server\Constants\ServerConstants;
-use SuperKernel\Server\Contract\ServerConfigInterface;
+use SuperKernel\Server\Constants\ModeConstants;
+use SuperKernel\Server\Constants\TypeConstants;
+use SuperKernel\Server\Contract\ServerInterface;
 use Swoole\Constant;
 use function swoole_cpu_num;
 use const SWOOLE_HOOK_ALL;
 use const SWOOLE_SOCK_TCP;
 
-#[Configuration(ServerConfigInterface::class)]
-final readonly class ServerConfig implements ServerConfigInterface
+#[Configuration(ServerInterface::class)]
+final readonly class Server implements ServerInterface
 {
-	public function getHookFlags(): int
+	public function getMode(): ModeConstants
 	{
-		return SWOOLE_HOOK_ALL;
+		return ModeConstants::SWOOLE_PROCESS;
 	}
 
 	public function getType(): ServerConstants
@@ -26,25 +27,21 @@ final readonly class ServerConfig implements ServerConfigInterface
 		return ServerConstants::Asynchronous;
 	}
 
-	public function getMode(): ServerModeConstants
+	public function getHookFlags(): int
 	{
-		return ServerModeConstants::SWOOLE_PROCESS;
+		return SWOOLE_HOOK_ALL;
 	}
 
-	public function getServers(): array
+	public function getServers(): iterable
 	{
-		return [
-			[
-				'name'      => 'http',
-				'type'      => ServerTypeConstants::SERVER_HTTP,
-				'host'      => '127.0.0.1',
-				'port'      => [
-					9901,
-				],
-				'sock_type' => SWOOLE_SOCK_TCP,
-				'options'   => [],
-			],
-		];
+		yield new Config(
+			name    : 'http',
+			type    : TypeConstants::SERVER_HTTP,
+			host    : '127.0.0.1',
+			port    : 9901,
+			sockType: SWOOLE_SOCK_TCP,
+			settings: [],
+		);
 	}
 
 	public function getSettings(): array

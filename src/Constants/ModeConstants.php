@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Constants;
 
-enum ServerModeConstants: int
+enum ModeConstants: int
 {
 	case SWOOLE_BASE = 1;
 

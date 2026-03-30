@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace SuperKernelTest\Server\CallbackHandler;
 
 use SuperKernel\Attribute\Provider;
-use SuperKernel\Server\Contract\Callbacks\onRequestInterface;
+use SuperKernel\Server\Contract\Callbacks\OnRequestInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 
-#[Provider(onRequestInterface::class)]
-final class onRequest implements onRequestInterface
+#[Provider(OnRequestInterface::class)]
+final class OnRequest implements OnRequestInterface
 {
 	private string $serverName;
 
@@ -20,6 +20,6 @@ final class onRequest implements onRequestInterface
 
 	public function __invoke(Request $request, Response $response): void
 	{
-		var_dump('Handle Request Callback Event.');
+		$response->end('Handle Request Callback Event.');
 	}
 }
