@@ -8,8 +8,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SuperKernel\Command\AbstractCommand;
 use SuperKernel\Command\Annotation\Command;
-use SuperKernel\Config\Contract\ConfigInterface;
-use SuperKernel\Server\Contract\ServerInterface;
+use SuperKernel\Server\Contract\AsynchronousServerInterface;
+use SuperKernel\Server\Contract\ServerConfigInterface;
 use Swoole\Coroutine;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,15 +37,13 @@ final class StartServerCommand extends AbstractCommand
 	 */
 	public function execute(InputInterface $input, OutputInterface $output): int
 	{
-		/* @var ServerInterface $serverConfig */
-		$serverConfig = $this->container->get(ConfigInterface::class)->get(ServerInterface::class);
+		/* @var ServerConfigInterface $serverConfig */
+		$serverConfig = $this->container->get(ServerConfigInterface::class);
 
 		Coroutine::set(['hook_flags' => $serverConfig->getHookFlags()]);
 
-		$serverMode = $serverConfig->getType();
+		$this->container->get(AsynchronousServerInterface::class)->start();
 
-		$this->container->get($serverMode->value)->start();
-
-		return 0;
+		return self::SUCCESS;
 	}
 }

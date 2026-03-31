@@ -32,7 +32,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.4",
+        "php": "~8.4.0",
         "ext-swoole": "~6.0.0",
         "super-kernel/command": "~1.0.0"
     },

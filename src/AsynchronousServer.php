@@ -7,14 +7,10 @@ use Generator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionClass;
-use ReflectionObject;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
-use SuperKernel\Attribute\Autowired;
 use SuperKernel\Attribute\Provider;
-use SuperKernel\Config\Contract\ConfigInterface;
 use SuperKernel\Contract\AnnotationCollectorInterface;
-use SuperKernel\Contract\ReflectionCollectorInterface;
 use SuperKernel\Server\Attribute\CallbackEvent;
 use SuperKernel\Server\Constants\TypeConstants;
 use SuperKernel\Server\Constants\ModeConstants;
@@ -39,7 +35,8 @@ use SuperKernel\Server\Contract\Callbacks\OnWorkerErrorInterface;
 use SuperKernel\Server\Contract\Callbacks\OnWorkerExitInterface;
 use SuperKernel\Server\Contract\Callbacks\OnWorkerStartInterface;
 use SuperKernel\Server\Contract\Callbacks\OnWorkerStopInterface;
-use SuperKernel\Server\Contract\ServerInterface;
+use SuperKernel\Server\Contract\ServerConfigInterface;
+use SuperKernel\Server\Event\BeforeMainServerStart;
 use Swoole\Http\Server as SwooleHttpServer;
 use Swoole\Server;
 use Swoole\Server\Port as ServerPort;
@@ -53,41 +50,42 @@ final class AsynchronousServer implements AsynchronousServerInterface
 {
 	private Server $server;
 
-	#[Autowired]
-	protected readonly ReflectionCollectorInterface $reflectionCollector;
-
 	/**
-	 * @param ContainerInterface $container
-	 * @param ConfigInterface    $config
+	 * @param ContainerInterface       $container
+	 * @param EventDispatcherInterface $eventDispatcher
+	 * @param ServerConfigInterface    $serverConfig
 	 *
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	public function __construct(private readonly ContainerInterface $container, ConfigInterface $config)
+	public function __construct(
+		private readonly ContainerInterface       $container,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		ServerConfigInterface                     $serverConfig,
+	)
 	{
-		/* @var ServerInterface $serverConfig */
-		$serverConfig = $config->get(ServerInterface::class);
-
 		$mode = $serverConfig->getMode();
 
-		foreach ($serverConfig->getServers() as $server) {
-			$name = $server->getName();
-			$type = $server->getType();
-			$host = $server->getHost();
-			$port = $server->getPort();
-			$settings = $server->getSettings();
-			$sockType = $server->getSockType();
+		foreach ($serverConfig->getConfigs() as $config) {
+			$name = $config->getName();
+			$type = $config->getType();
+			$host = $config->getHost();
+			$port = $config->getPort();
+			$settings = $config->getSettings();
+			$sockType = $config->getSockType();
 
 			if (!isset($this->server)) {
 				$this->server = $this->makeServer($type, $mode, $host, $port, $sockType);
 				$this->server->set(array_replace($serverConfig->getSettings(), $settings));
 				$this->registerEvents($this->server, $name);
+
+				$this->eventDispatcher->dispatch(new BeforeMainServerStart($this->server, $config));
 			} else {
 				$vassalServer = $this->server->addlistener($host, $port, $sockType);
 				if (!$vassalServer) {
 					throw new RuntimeException("Failed to listen server port [$host:$port]");
 				}
-				$vassalServer->set($settings);
+				$vassalServer->set(array_replace($serverConfig->getSettings(), $settings));
 				$this->registerEvents($vassalServer, $name);
 			}
 		}
@@ -134,8 +132,6 @@ final class AsynchronousServer implements AsynchronousServerInterface
 						if (is_subclass_of($annotation->getClass(), CallbackEventInterface::class)) {
 							/* @var CallbackEvent $callbackEvent */
 							$callbackEvent = $annotation->getInstance();
-
-//							$this->reflectionCollector->reflectObject($callbackHandler)->initializeLazyObject($callbackHandler);
 
 							$callbackHandler->setServerName($serverName);
 							$server->on($callbackEvent->getEventName(), [$callbackHandler, '__invoke']);

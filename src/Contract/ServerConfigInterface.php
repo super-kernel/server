@@ -5,12 +5,9 @@ namespace SuperKernel\Server\Contract;
 
 use SuperKernel\Server\Config;
 use SuperKernel\Server\Constants\ModeConstants;
-use SuperKernel\Server\Constants\ServerConstants;
 
-interface ServerInterface
+interface ServerConfigInterface
 {
-	public function getType(): ServerConstants;
-
 	public function getMode(): ModeConstants;
 
 	public function getHookFlags(): int;
@@ -18,7 +15,7 @@ interface ServerInterface
 	/**
 	 * @return iterable<Config>
 	 */
-	public function getServers(): iterable;
+	public function getConfigs(): iterable;
 
 	public function getSettings(): array;
 }

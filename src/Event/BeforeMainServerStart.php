@@ -3,6 +3,12 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Event;
 
-final class BeforeMainServerStart
+use SuperKernel\Server\Config;
+use Swoole\Server;
+
+final readonly class BeforeMainServerStart
 {
+	public function __construct(public Server $server, public Config $config)
+	{
+	}
 }

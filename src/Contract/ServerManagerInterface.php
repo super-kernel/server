@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Contract;
 
-interface CoroutineServerInterface
+interface ServerManagerInterface
 {
-	public function start(): void;
+	public function add();
 }
