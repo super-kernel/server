@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SuperKernel\Attribute\Factory;
 use SuperKernel\Attribute\Provider;
-use SuperKernel\Server\Contract\AsynchronousServerInterface;
+use SuperKernel\Server\Contract\ServerInterface;
 use Swoole\Server;
 
 #[
@@ -26,6 +26,6 @@ final class SwooleServerProvider
 	 */
 	public function __invoke(ContainerInterface $container): Server
 	{
-		return $container->get(AsynchronousServerInterface::class)->getServer();
+		return $container->get(ServerInterface::class)->getServer();
 	}
 }

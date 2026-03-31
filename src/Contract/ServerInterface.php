@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Contract;
 
-interface ServerManagerInterface
+interface ServerInterface
 {
-	public function add();
+	public function start(): void;
 }

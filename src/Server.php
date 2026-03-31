@@ -14,7 +14,7 @@ use SuperKernel\Contract\AnnotationCollectorInterface;
 use SuperKernel\Server\Attribute\CallbackEvent;
 use SuperKernel\Server\Constants\TypeConstants;
 use SuperKernel\Server\Constants\ModeConstants;
-use SuperKernel\Server\Contract\AsynchronousServerInterface;
+use SuperKernel\Server\Contract\ServerInterface;
 use SuperKernel\Server\Contract\CallbackEventInterface;
 use SuperKernel\Server\Contract\Callbacks\OnAfterReloadInterface;
 use SuperKernel\Server\Contract\Callbacks\OnBeforeReloadInterface;
@@ -38,17 +38,17 @@ use SuperKernel\Server\Contract\Callbacks\OnWorkerStopInterface;
 use SuperKernel\Server\Contract\ServerConfigInterface;
 use SuperKernel\Server\Event\BeforeMainServerStart;
 use Swoole\Http\Server as SwooleHttpServer;
-use Swoole\Server;
+use Swoole\Server as SwooleServer;
 use Swoole\Server\Port as ServerPort;
 use Swoole\WebSocket\Server as SwooleWebsocketServer;
 use function array_replace;
 use function class_implements;
 use function is_subclass_of;
 
-#[Provider(AsynchronousServerInterface::class)]
-final class AsynchronousServer implements AsynchronousServerInterface
+#[Provider(ServerInterface::class)]
+final class Server implements ServerInterface
 {
-	private Server $server;
+	private SwooleServer $server;
 
 	/**
 	 * @param ContainerInterface       $container
@@ -93,26 +93,26 @@ final class AsynchronousServer implements AsynchronousServerInterface
 
 	private function makeServer(
 		TypeConstants $serverType,
-		ModeConstants $serverMode, string $host, int|array $port, int $sockType): Server
+		ModeConstants $serverMode, string $host, int|array $port, int $sockType): SwooleServer
 	{
 		$mode = $serverMode->value;
 
 		return match (true) {
-			$serverType === TypeConstants::SERVER_BASE      => new Server($host, $port, $mode, $sockType),
+			$serverType === TypeConstants::SERVER_BASE      => new SwooleServer($host, $port, $mode, $sockType),
 			$serverType === TypeConstants::SERVER_HTTP      => new SwooleHttpServer($host, $port, $mode, $sockType),
 			$serverType === TypeConstants::SERVER_WEBSOCKET => new SwooleWebsocketServer($host, $port, $mode, $sockType),
 		};
 	}
 
 	/**
-	 * @param Server|ServerPort $server
-	 * @param string            $serverName
+	 * @param SwooleServer|ServerPort $server
+	 * @param string                  $serverName
 	 *
 	 * @return void
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
-	private function registerEvents(Server|ServerPort $server, string $serverName): void
+	private function registerEvents(SwooleServer|ServerPort $server, string $serverName): void
 	{
 		/* @var AnnotationCollectorInterface $annotationCollector */
 		$annotationCollector = $this->container->get(AnnotationCollectorInterface::class);
