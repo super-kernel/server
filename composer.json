@@ -1,0 +1,43 @@
+{
+    "name": "super-kernel/server",
+    "description": "The server component for super-kernel.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "swoole",
+        "super-kernel",
+        "server"
+    ],
+    "homepage": "https://github.com/super-kernel/server",
+    "support": {
+        "issues": "https://github.com/super-kernel/server/issues",
+        "source": "https://github.com/super-kernel/server"
+    },
+    "autoload": {
+        "psr-4": {
+            "SuperKernel\\Server\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SuperKernelTest\\Server\\": "tests/"
+        }
+    },
+    "config": {
+        "classmap-authoritative": true,
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "~8.4.0",
+        "ext-swoole": "~6.0.0",
+        "super-kernel/command": "dev-main"
+    },
+    "require-dev": {
+        "super-kernel/framework": "dev-main",
+        "swoole/ide-helper": "~6.0.0"
+    }
+}
