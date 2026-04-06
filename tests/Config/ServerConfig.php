@@ -23,18 +23,29 @@ final readonly class ServerConfig implements ServerConfigInterface
 
 	public function getHookFlags(): int
 	{
-		return SWOOLE_HOOK_ALL;
+		return 0;
+//		return SWOOLE_HOOK_ALL;
 	}
 
 	public function getConfigs(): iterable
 	{
 		yield new Config(
 			name    : 'http',
+			type    : TypeConstants::SERVER_BASE,
+			host    : '127.0.0.1',
+			port    : 9900,
+			sockType: SWOOLE_SOCK_TCP,
+			settings: [],
+		);
+		yield new Config(
+			name    : 'http',
 			type    : TypeConstants::SERVER_HTTP,
 			host    : '127.0.0.1',
 			port    : 9901,
 			sockType: SWOOLE_SOCK_TCP,
-			settings: [],
+			settings: [
+				          'open_http_protocol' => true,
+			          ],
 		);
 	}
 
@@ -45,7 +56,7 @@ final readonly class ServerConfig implements ServerConfigInterface
 			Constant::OPTION_WORKER_NUM          => swoole_cpu_num(),
 			Constant::OPTION_MAX_REQUEST         => 100000,
 			Constant::OPTION_MAX_COROUTINE       => 100000,
-			Constant::OPTION_ENABLE_COROUTINE    => false,
+			Constant::OPTION_ENABLE_COROUTINE    => true,
 			Constant::OPTION_OPEN_TCP_NODELAY    => true,
 			Constant::OPTION_OPEN_HTTP2_PROTOCOL => true,
 			Constant::OPTION_SOCKET_BUFFER_SIZE  => 2 * 1024 * 1024,

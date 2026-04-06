@@ -32,6 +32,10 @@ final class SwooleServerProvider
 
 	public function __invoke(EventDispatcherInterface $eventDispatcher, ServerConfigInterface $serverConfig): Server
 	{
+		if ($serverConfig->getSettings()['event_object'] ?? false) {
+			throw new RuntimeException('Object-style event callbacks are not currently supported.');
+		}
+
 		Coroutine::set(['hook_flags' => $serverConfig->getHookFlags()]);
 
 		$mode = $serverConfig->getMode()->value;
@@ -44,25 +48,18 @@ final class SwooleServerProvider
 			$settings = array_replace($serverConfig->getSettings(), $config->getSettings());
 			$sockType = $config->getSockType();
 
-			$server = $this->makeServer($type, $mode, $host, $port, $sockType, $settings);
+			if (!isset($this->server)) {
+				$this->server = $this->makeMainServer($type, $mode, $host, $port, $sockType, $settings);
 
-			$this->eventDispatcher->dispatch(new BeforeServerStart($name, $server));
+				$this->eventDispatcher->dispatch(new BeforeMainServerStart($this->server));
+			} else {
+				$vassalServer = $this->makeVassalServer($host, $port, $sockType, $settings);
+
+				$this->eventDispatcher->dispatch(new BeforeServerStart($name, $vassalServer));
+			}
 		}
 
 		return $this->server;
-	}
-
-	private function makeServer(TypeConstants $type, int $mode, string $host, int $port, int $sockType, array $settings): Port|Server
-	{
-		if (!isset($this->server)) {
-			$this->server = $this->makeMainServer($type, $mode, $host, $port, $sockType, $settings);
-
-			$this->eventDispatcher->dispatch(new BeforeMainServerStart($this->server));
-
-			return $this->server;
-		}
-
-		return $this->makeVassalServer($host, $port, $sockType, $settings);
 	}
 
 	private function makeMainServer(TypeConstants $type, int $mode, string $host, int $port, int $sockType, array $settings): Server

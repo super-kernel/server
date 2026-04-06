@@ -5,14 +5,14 @@ namespace SuperKernelTest\Server\Listener;
 
 use SuperKernel\Attribute\Listener;
 use SuperKernel\Contract\ListenerInterface;
-use SuperKernel\Server\Event\BeforeServerStart;
+use SuperKernel\Server\Event\BeforeMainServerStart;
 use SuperKernelTest\Server\Callbacks\OnReceive;
 use SuperKernelTest\Server\Callbacks\OnRequest;
 use Swoole\Http\Server as HttpServer;
 use Swoole\Server;
 
 #[Listener]
-final readonly class BeforeServerStartListener implements ListenerInterface
+final readonly class BeforeMainServerStartListener implements ListenerInterface
 {
 	public function __construct(
 		private OnReceive $onReceive,
@@ -24,18 +24,25 @@ final readonly class BeforeServerStartListener implements ListenerInterface
 	public function listen(): array
 	{
 		return [
-			BeforeServerStart::class,
+			BeforeMainServerStart::class,
 		];
 	}
 
-	/* @psalm-param BeforeServerStart $event */
+	/* @psalm-param BeforeMainServerStart $event */
 	public function process(object $event): void
 	{
-		$port = $event->server;
+		$server = $event->server;
+
+		var_dump(
+			[
+				__CLASS__,
+				$server instanceof HttpServer,
+			],
+		);
 
 		match (true) {
-			$port instanceof HttpServer => $port->on('request', [$this->onRequest, '__invoke']),
-			$port instanceof Server     => $port->on('receive', [$this->onReceive, '__invoke']),
+			$server instanceof HttpServer => $server->on('request', [$this->onRequest, '__invoke']),
+			$server instanceof Server     => $server->on('receive', [$this->onReceive, '__invoke']),
 			default                       => null,
 		};
 	}
