@@ -16,6 +16,9 @@
         "symfony/console": "^8.1.9"
     },
     "require-dev": {
+        "ext-pcntl": "*",
+        "ext-posix": "*",
+        "ext-sockets": "*",
         "friendsofphp/php-cs-fixer": "^3.95.27",
         "phpunit/phpunit": "^13.4.3",
         "swoole/ide-helper": "^6.2.3"
