@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SuperKernel\Server\Config;
 
-use SuperKernel\Server\Enum\Mode;
-use SuperKernel\Server\Enum\Protocol;
+use SuperKernel\Server\Constants\Mode;
+use SuperKernel\Server\Constants\Protocol;
 
 /**
  * Supplies the application-owned input used to configure one Swoole service.

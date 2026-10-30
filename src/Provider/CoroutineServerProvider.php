@@ -6,7 +6,7 @@ namespace SuperKernel\Server\Provider;
 
 use SuperKernel\Attribute\FactoryProvider;
 use SuperKernel\Server\Config\SwooleServerConfigInterface;
-use SuperKernel\Server\Enum\Mode;
+use SuperKernel\Server\Constants\Mode;
 use SuperKernel\Server\Exception\ServerCreationException;
 use SuperKernel\Server\Exception\UnsupportedServerModeException;
 use Swoole\Coroutine\Server as CoroutineServer;
