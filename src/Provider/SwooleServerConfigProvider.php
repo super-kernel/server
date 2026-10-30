@@ -8,34 +8,23 @@ use Psr\Container\ContainerExceptionInterface;
 use SuperKernel\Attribute\FactoryProvider;
 use SuperKernel\Config\Exception\ConfigurationNotFoundException;
 use SuperKernel\Contract\ConfigInterface;
+use SuperKernel\Server\Config\ListenerConfigurationValidator;
+use SuperKernel\Server\Config\ProtocolCapability;
 use SuperKernel\Server\Config\SwooleServerConfigInterface;
-use SuperKernel\Server\Enum\Mode;
-use SuperKernel\Server\Enum\Protocol;
+use SuperKernel\Server\Constants\Mode;
+use SuperKernel\Server\Constants\Protocol;
 use SuperKernel\Server\Exception\InvalidServerConfigurationException;
 
 use function array_is_list;
-use function array_key_exists;
 use function array_keys;
 use function count;
 use function get_debug_type;
-use function is_array;
 use function is_string;
 use function sprintf;
 
 #[FactoryProvider(SwooleServerConfigInterface::class)]
 final readonly class SwooleServerConfigProvider
 {
-    /** @var array<string, string> */
-    private const array LISTENER_FIELD_TYPES = [
-        'name'       => 'string',
-        'host'       => 'string',
-        'port'       => 'int',
-        'socketType' => 'int',
-        'ssl'        => 'bool',
-        'reusePort'  => 'bool',
-        'protocol'   => Protocol::class,
-    ];
-
     /**
      * @throws ContainerExceptionInterface         When the declared application source cannot be loaded
      * @throws ConfigurationNotFoundException      When no Server configuration source is declared
@@ -58,17 +47,6 @@ final readonly class SwooleServerConfigProvider
         }
 
         $mode = $configuration->mode();
-        $this->validateListeners($configuration, $mode);
-        $this->validateSettings($configuration->settings());
-
-        return $configuration;
-    }
-
-    private function validateListeners(
-        SwooleServerConfigInterface $configuration,
-        Mode                        $mode,
-    ): void
-    {
         $configuredListeners = $configuration->listeners();
 
         if (!array_is_list($configuredListeners)) {
@@ -95,7 +73,7 @@ final readonly class SwooleServerConfigProvider
         $listenerNames = [];
 
         foreach ($configuredListeners as $position => $listener) {
-            $this->validateListener($listener, $position + 1);
+            ListenerConfigurationValidator::validate($listener, $position + 1);
             $name = $listener['name'];
 
             if (isset($listenerNames[$name])) {
@@ -121,110 +99,35 @@ final readonly class SwooleServerConfigProvider
                     $protocol->value,
                 ));
             }
+        } else {
+            $primaryProtocol = $configuredListeners[0]['protocol'] ?? Protocol::Raw;
 
-            return;
-        }
+            foreach ($configuredListeners as $position => $listener) {
+                $protocol = $listener['protocol'] ?? Protocol::Raw;
 
-        $primaryProtocol = $configuredListeners[0]['protocol'] ?? Protocol::Raw;
+                if (ProtocolCapability::rank($protocol) <= ProtocolCapability::rank($primaryProtocol)) {
+                    continue;
+                }
 
-        foreach ($configuredListeners as $position => $listener) {
-            $protocol = $listener['protocol'] ?? Protocol::Raw;
-
-            if ($this->protocolRank($protocol) <= $this->protocolRank($primaryProtocol)) {
-                continue;
-            }
-
-            throw new InvalidServerConfigurationException(sprintf(
-                'Listener "%s" at position %d requires the "%s" protocol, '
-                . 'which exceeds primary listener "%s" using "%s"; '
-                . 'place a listener with the highest protocol capability first.',
-                $listener['name'],
-                $position + 1,
-                $protocol->value,
-                $configuredListeners[0]['name'],
-                $primaryProtocol->value,
-            ));
-        }
-    }
-
-    private function validateListener(mixed $listener, int $position): void
-    {
-        if (!is_array($listener)) {
-            throw new InvalidServerConfigurationException(sprintf(
-                'Listener configuration at position %d must be an array; %s provided.',
-                $position,
-                get_debug_type($listener),
-            ));
-        }
-
-        foreach ([
-            'name',
-            'host',
-            'port',
-        ] as $field) {
-            if (!array_key_exists($field, $listener)) {
                 throw new InvalidServerConfigurationException(sprintf(
-                    'Listener configuration at position %d is missing required field "%s".',
-                    $position,
-                    $field,
+                    'Listener "%s" at position %d requires the "%s" protocol, '
+                    . 'which exceeds primary listener "%s" using "%s"; '
+                    . 'place a listener with the highest protocol capability first.',
+                    $listener['name'],
+                    $position + 1,
+                    $protocol->value,
+                    $configuredListeners[0]['name'],
+                    $primaryProtocol->value,
                 ));
             }
         }
 
-        foreach ($listener as $field => $value) {
-            $expectedType = self::LISTENER_FIELD_TYPES[$field] ?? null;
-
-            if (null === $expectedType) {
-                throw new InvalidServerConfigurationException(sprintf(
-                    'Listener configuration at position %d contains unknown field "%s".',
-                    $position,
-                    $field,
-                ));
-            }
-
-            if (get_debug_type($value) !== $expectedType) {
-                throw new InvalidServerConfigurationException(sprintf(
-                    'Listener field "%s" at position %d must be %s; %s provided.',
-                    $field,
-                    $position,
-                    $expectedType,
-                    get_debug_type($value),
-                ));
-            }
-        }
-
-        foreach ([
-            'name',
-            'host',
-        ] as $field) {
-            if ('' === $listener[$field]) {
-                throw new InvalidServerConfigurationException(sprintf(
-                    'Listener configuration at position %d must define a non-empty %s.',
-                    $position,
-                    $field,
-                ));
-            }
-        }
-    }
-
-    /**
-     * @param array<array-key, mixed> $settings
-     */
-    private function validateSettings(array $settings): void
-    {
-        foreach (array_keys($settings) as $name) {
-            if (!is_string($name)) {
+        foreach (array_keys($configuration->settings()) as $settingName) {
+            if (!is_string($settingName)) {
                 throw new InvalidServerConfigurationException('Swoole server settings must use string keys.');
             }
         }
-    }
 
-    private function protocolRank(Protocol $protocol): int
-    {
-        return match ($protocol) {
-            Protocol::Raw       => 0,
-            Protocol::Http      => 1,
-            Protocol::WebSocket => 2,
-        };
+        return $configuration;
     }
 }

@@ -24,8 +24,8 @@ in declared order.
 ```php
 use SuperKernel\Attribute\Configuration;
 use SuperKernel\Server\Config\SwooleServerConfigInterface;
-use SuperKernel\Server\Enum\Mode;
-use SuperKernel\Server\Enum\Protocol;
+use SuperKernel\Server\Constants\Mode;
+use SuperKernel\Server\Constants\Protocol;
 
 #[Configuration(SwooleServerConfigInterface::class)]
 final readonly class ApplicationSwooleServerConfig implements SwooleServerConfigInterface

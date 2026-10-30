@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SuperKernel\Server\Enum;
+namespace SuperKernel\Server\Constants;
 
 /**
  * Selects the native Swoole execution model used by the configured server.

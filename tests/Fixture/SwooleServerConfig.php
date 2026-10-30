@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SuperKernel\Server\Tests\Fixture;
 
 use SuperKernel\Server\Config\SwooleServerConfigInterface;
-use SuperKernel\Server\Enum\Mode;
+use SuperKernel\Server\Constants\Mode;
 
 final readonly class SwooleServerConfig implements SwooleServerConfigInterface
 {
