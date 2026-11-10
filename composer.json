@@ -9,10 +9,10 @@
         "ext-swoole": ">=6.2.3 <6.3",
         "psr/container": "^2.0.2",
         "psr/event-dispatcher": "^1.0",
-        "super-kernel/attribute": "dev-main",
-        "super-kernel/config": "dev-main",
-        "super-kernel/contract": "dev-main",
-        "super-kernel/swoole": "dev-main",
+        "super-kernel/attribute": "self.version",
+        "super-kernel/config": "self.version",
+        "super-kernel/contract": "self.version",
+        "super-kernel/swoole": "self.version",
         "symfony/console": "^8.1.9"
     },
     "require-dev": {
