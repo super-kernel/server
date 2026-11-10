@@ -12,7 +12,7 @@
         "super-kernel/attribute": "self.version",
         "super-kernel/config": "self.version",
         "super-kernel/contract": "self.version",
-        "super-kernel/swoole": "self.version",
+        "super-kernel/swoole": "dev-main || ^1.0.0-alpha.1",
         "symfony/console": "^8.1.9"
     },
     "require-dev": {
